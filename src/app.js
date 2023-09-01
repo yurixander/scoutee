@@ -64,7 +64,7 @@ function createApplicationEntry(name, tabIndex) {
     endSession()
   }
 
-  $result.addEventListener("click", () => openResult())
+  $result.addEventListener("dblclick", () => openResult())
 
   $result.addEventListener("keyup", (e) => {
     if (e.key === "Enter")
@@ -86,6 +86,12 @@ function setResults(results) {
 }
 
 window.onload = () => {
+  // BUG: Pressing 'TAB' multiple times triggers a blur event for some reason, causing the application to hide (session end).
+  // Hide the application when the window loses focus.
+  // The user can always quickly summon it again using the
+  // configured hotkey.
+  // window.addEventListener("blur", () => endSession())
+
   window.addEventListener("keyup", (e) => {
     const isSearchFocused = document.activeElement === $search
     const isPossibleHotkey = e.ctrlKey || e.metaKey || e.altKey
@@ -96,6 +102,11 @@ window.onload = () => {
     // and append the key to its value.
     else if (!isSearchFocused && !isPossibleHotkey && e.key.match(/^[a-z0-9]$/i)) {
       $search.value += e.key
+      $search.focus()
+      updateResults()
+    }
+    else if (e.key === "Backspace" && !isSearchFocused) {
+      $search.value = $search.value.slice(0, -1)
       $search.focus()
       updateResults()
     }

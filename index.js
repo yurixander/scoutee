@@ -23,18 +23,16 @@ function createWindow() {
 
   remote.initialize()
   remote.enable(window.webContents)
-  window.loadFile("index.html")
-
-  // Hide the application when the window loses focus.
-  // The user can always quickly summon it again using the
-  // configured hotkey.
-  app.addListener("browser-window-blur", () => window.hide())
 
   // Exit the application when the user tries to open a second
   // instance of it.
   app.addListener("second-instance", () => app.exit())
 
-  globalShortcut.register(GLOBAL_SUMMON_HOTKEY, () => window.show())
+  // After the index file's content has been loaded, register the
+  // global shortcut which allows the user to summon the application.
+  window.loadFile("index.html").then(() =>
+    globalShortcut.register(GLOBAL_SUMMON_HOTKEY, () => window.show())
+  )
 }
 
 app.whenReady().then(() => createWindow())
