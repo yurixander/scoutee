@@ -1,10 +1,6 @@
-const fs = require("fs")
-const {exec} = require("child_process")
 const {app} = require("@electron/remote")
-const icns = require("electron-icns-ex")
-const {getMacOSApplications, getApplicationWindow, endSession} = require("../src/util.js")
+const util = require("../src/util.js")
 
-const applications = getMacOSApplications()
 const $search = document.getElementById("search")
 const $results = document.getElementById("results")
 
@@ -18,66 +14,71 @@ function updateResults() {
     return
   }
 
-  const results = applications.filter(
-    application => application.toLowerCase().includes(query)
-  )
+  const filteredEntries = util.getMacOSAppEntries()
+    .concat(util.getAuxEntries())
+    .filter(entry => entry.name.toLowerCase().includes(query))
+    .concat(util.getMetaEntries())
 
-  setResults(results)
+  setResults(filteredEntries)
 }
 
-function createApplicationEntry(name, tabIndex) {
+function $createEntry(entry, tabIndex) {
   const $result = document.createElement("li")
   const $icon = document.createElement("img")
   const $name = document.createElement("span")
   const $label = document.createElement("span")
-  const appResourcesPath = `/Applications/${name}.app/Contents/Resources`
-
-  const firstIcon = fs.readdirSync(appResourcesPath)
-    .find(file => file.endsWith(".icns"))
-
-  const iconPath = `${appResourcesPath}/${firstIcon}`
-  const iconBase64 = icns.parseIcnsToBase64Sync(iconPath)
 
   $result.setAttribute("tabindex", tabIndex)
-  $icon.setAttribute("src", iconBase64)
-  $name.textContent = name
-  $label.textContent = "macOS application (.app)"
+  $icon.setAttribute("src", entry.icon)
+  $name.textContent = entry.name
+  $label.textContent = entry.label
   $label.classList.add("label")
   $result.appendChild($icon)
   $result.appendChild($name)
   $result.appendChild($label)
 
-  const openResult = () => {
-    exec(`open -a "${name}"`)
-    endSession()
+  const invokeHandler = () => {
+    entry.handler($search.value)
+    util.endSession()
   }
 
-  $result.addEventListener("dblclick", () => openResult())
+  $result.addEventListener("dblclick", () => invokeHandler())
 
   $result.addEventListener("keyup", (e) => {
     if (e.key === "Enter")
-      openResult()
+      invokeHandler()
   })
 
   return $result
 }
 
-function setResults(results) {
+function transformEntries(entries) {
+  return entries.map(entry => {
+    return {
+      ...entry,
+      name: entry.name.replace("{query}", $search.value),
+    }
+  })
+}
+
+function setResults(entries) {
+  const transformedEntries = transformEntries(entries)
+
   $results.innerHTML = ""
 
-  for (const [index, result] of results.entries())
-    $results.appendChild(createApplicationEntry(result, index))
+  for (const [index, entry] of transformedEntries.entries())
+    $results.appendChild($createEntry(entry, index))
 
   // TODO: Need to apply apply border radius to search bar when there are and aren't results.
   // Hide the results list completely if there are no results.
-  $results.style.display = results.length > 0 ? "block" : "none"
+  $results.style.display = transformedEntries.length > 0 ? "block" : "none"
 
   // Update the window's height to match the height of the results list.
   // Since the window uses transparency, this is required to prevent
   // the initial window size from being too large, and thus taking up
   // 'ghost' space on the screen where clicks will be intercepted by
   // the window, and not the application behind it.
-  const appWindow = getApplicationWindow()
+  const appWindow = util.getApplicationWindow()
 
   appWindow.setSize(appWindow.getSize()[0], document.body.clientHeight)
 }
@@ -86,7 +87,7 @@ window.onload = () => {
   // Hide the application when the window loses focus.
   // The user can always quickly summon it again using the
   // configured hotkey.
-  app.on("browser-window-blur", () => endSession())
+  app.on("browser-window-blur", () => util.endSession())
 
   // Fixes the issue where when the session ends while the
   // search input isn't focused (ie. one of the results is),
@@ -99,7 +100,7 @@ window.onload = () => {
     const isPossibleHotkey = e.ctrlKey || e.metaKey || e.altKey
 
     if (e.key === "Escape")
-      endSession()
+      util.endSession()
     // If the key is alphanumeric, focus the search input,
     // and append the key to its value.
     else if (!isSearchFocused && !isPossibleHotkey && e.key.match(/^[a-z0-9]$/i)) {
@@ -114,5 +115,5 @@ window.onload = () => {
     }
   })
 
-  $search.addEventListener("keyup", (_event) => updateResults())
+  $search.addEventListener("keyup", (_e) => updateResults())
 }
