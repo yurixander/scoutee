@@ -1,0 +1,32 @@
+* {
+  box-sizing: border-box;
+  outline: none;
+}
+
+:root {
+  --color-white: #fff;
+  --color-gray: #757575;
+  --color-border: #444;
+  --background: rgba(34, 34, 34, 0.9);
+  --border-radius: 10px;
+  --border-radius-small: 5px;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+  font-size: 25px;
+  user-select: none;
+}
+
+input {
+  font-size: inherit;
+  width: 100%;
+  outline: none;
+}

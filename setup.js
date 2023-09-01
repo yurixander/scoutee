@@ -1,7 +1,9 @@
 const {app, globalShortcut, BrowserWindow} = require("electron")
 const remote = require("@electron/remote/main")
 
-const GLOBAL_SUMMON_HOTKEY = "CommandOrControl+X"
+const config = {
+  globalSummonHotkey: "CommandOrControl+X"
+}
 
 function createWindow() {
   const window = new BrowserWindow({
@@ -30,8 +32,8 @@ function createWindow() {
 
   // After the index file's content has been loaded, register the
   // global shortcut which allows the user to summon the application.
-  window.loadFile("index.html").then(() =>
-    globalShortcut.register(GLOBAL_SUMMON_HOTKEY, () => window.show())
+  window.loadFile("windows/main.html").then(() =>
+    globalShortcut.register(config.globalSummonHotkey, () => window.show())
   )
 }
 

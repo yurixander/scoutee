@@ -2,7 +2,7 @@
   "name": "cross-platform-launcher",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "setup.js",
   "scripts": {
     "start": "electron ."
   },

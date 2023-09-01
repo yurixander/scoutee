@@ -1,26 +1,12 @@
 const fs = require("fs")
-const path = require("path")
 const {exec} = require("child_process")
-const icns = require("electron-icns-ex")
 const {app} = require("@electron/remote")
+const icns = require("electron-icns-ex")
+const {getMacOSApplications, getApplicationWindow, endSession} = require("../src/util.js")
 
 const applications = getMacOSApplications()
 const $search = document.getElementById("search")
 const $results = document.getElementById("results")
-
-function endSession() {
-  $search.value = ""
-  setResults([])
-  app.hide()
-}
-
-function getMacOSApplications() {
-  const applicationFolderContents = fs.readdirSync("/Applications")
-
-  return applicationFolderContents
-    .filter(application => application.endsWith(".app"))
-    .map(application => path.basename(application, ".app"))
-}
 
 function updateResults() {
   const query = $search.value.toLowerCase()
@@ -32,7 +18,9 @@ function updateResults() {
     return
   }
 
-  const results = applications.filter(application => application.toLowerCase().includes(query))
+  const results = applications.filter(
+    application => application.toLowerCase().includes(query)
+  )
 
   setResults(results)
 }
@@ -83,14 +71,22 @@ function setResults(results) {
   // TODO: Need to apply apply border radius to search bar when there are and aren't results.
   // Hide the results list completely if there are no results.
   $results.style.display = results.length > 0 ? "block" : "none"
+
+  // Update the window's height to match the height of the results list.
+  // Since the window uses transparency, this is required to prevent
+  // the initial window size from being too large, and thus taking up
+  // 'ghost' space on the screen where clicks will be intercepted by
+  // the window, and not the application behind it.
+  const appWindow = getApplicationWindow()
+
+  appWindow.setSize(appWindow.getSize()[0], document.body.clientHeight)
 }
 
 window.onload = () => {
-  // BUG: Pressing 'TAB' multiple times triggers a blur event for some reason, causing the application to hide (session end).
   // Hide the application when the window loses focus.
   // The user can always quickly summon it again using the
   // configured hotkey.
-  // window.addEventListener("blur", () => endSession())
+  app.on("browser-window-blur", () => endSession())
 
   // Fixes the issue where when the session ends while the
   // search input isn't focused (ie. one of the results is),
