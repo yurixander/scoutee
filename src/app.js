@@ -92,6 +92,12 @@ window.onload = () => {
   // configured hotkey.
   // window.addEventListener("blur", () => endSession())
 
+  // Fixes the issue where when the session ends while the
+  // search input isn't focused (ie. one of the results is),
+  // when the application is shown again, the search input
+  // isn't focused.
+  window.addEventListener("focus", () => $search.focus())
+
   window.addEventListener("keyup", (e) => {
     const isSearchFocused = document.activeElement === $search
     const isPossibleHotkey = e.ctrlKey || e.metaKey || e.altKey
