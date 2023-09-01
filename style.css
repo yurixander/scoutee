@@ -76,3 +76,12 @@ input {
   border-radius: var(--border-radius-small);
   margin-right: 1ch;
 }
+
+#results>li>span.label {
+  opacity: 0.5;
+}
+
+#results>li>span.label::before {
+  content: "\2014";
+  margin: 0 0.5ch;
+}

@@ -41,6 +41,7 @@ function createApplicationEntry(name, tabIndex) {
   const $result = document.createElement("li")
   const $icon = document.createElement("img")
   const $name = document.createElement("span")
+  const $label = document.createElement("span")
   const appResourcesPath = `/Applications/${name}.app/Contents/Resources`
 
   const firstIcon = fs.readdirSync(appResourcesPath)
@@ -52,8 +53,11 @@ function createApplicationEntry(name, tabIndex) {
   $result.setAttribute("tabindex", tabIndex)
   $icon.setAttribute("src", iconBase64)
   $name.textContent = name
+  $label.textContent = "macOS application (.app)"
+  $label.classList.add("label")
   $result.appendChild($icon)
   $result.appendChild($name)
+  $result.appendChild($label)
 
   const openResult = () => {
     exec(`open -a "${name}"`)
