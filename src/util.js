@@ -45,17 +45,32 @@ function getMacOSAppEntries() {
 }
 
 function getAuxEntries() {
-  return []
+  return [
+    {
+      name: "Shutdown",
+      label: "Shutdown the computer",
+      icon: "https://parsefiles.back4app.com/JPaQcFfEEQ1ePBxbf6wvzkPMEqKYHhPYv8boI1Rc/eaebd9208547ca9316da47f98b0ddf12_CuaBNbopgF.png",
+      handler: (_query) => exec("shutdown now")
+    }
+  ]
 }
 
 function getMetaEntries() {
-  return [{
-    name: "{query}",
-    label: "Search the web with DuckDuckGo",
-    icon: "https://duckduckgo.com/favicon.ico",
-    // TODO: Open a browser window with the query.
-    handler: (query) => exec(`open "https://duckduckgo.com/?q=${query}"`)
-  }]
+  return [
+    {
+      name: "Web search for {query}",
+      label: "Search the web with DuckDuckGo",
+      icon: "https://duckduckgo.com/favicon.ico",
+      // TODO: Open a browser window with the query.
+      handler: (query) => exec(`open "https://duckduckgo.com/?q=${query}"`)
+    },
+    {
+      name: "Run {query}",
+      label: "Execute a command in the terminal",
+      icon: "https://parsefiles.back4app.com/JPaQcFfEEQ1ePBxbf6wvzkPMEqKYHhPYv8boI1Rc/6b14ea01f5623788cd2828d59755425f_4M3jQW9cFG.png",
+      handler: (query) => exec(query)
+    }
+  ]
 }
 
 module.exports = {

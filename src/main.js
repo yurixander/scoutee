@@ -9,17 +9,15 @@ function updateResults() {
 
   // Reset the results if the query is empty.
   if (query === "") {
-    setResults([])
+    renderEntries([])
 
     return
   }
 
-  const filteredEntries = util.getMacOSAppEntries()
-    .concat(util.getAuxEntries())
+  const filteredAppEntries = util.getMacOSAppEntries()
     .filter(entry => entry.name.toLowerCase().includes(query))
-    .concat(util.getMetaEntries())
 
-  setResults(filteredEntries)
+  renderEntries([filteredAppEntries, util.getAuxEntries(), util.getMetaEntries()])
 }
 
 function $createEntry(entry, tabIndex) {
@@ -52,6 +50,10 @@ function $createEntry(entry, tabIndex) {
   return $result
 }
 
+function $createSeparator() {
+  return document.createElement("hr")
+}
+
 function transformEntries(entries) {
   return entries.map(entry => {
     return {
@@ -61,17 +63,23 @@ function transformEntries(entries) {
   })
 }
 
-function setResults(entries) {
-  const transformedEntries = transformEntries(entries)
-
+function renderEntries(entryGroups) {
   $results.innerHTML = ""
+  let isFirstGroup = true
 
-  for (const [index, entry] of transformedEntries.entries())
-    $results.appendChild($createEntry(entry, index))
+  for (const entryGroup of entryGroups) {
+    if (entryGroup.length === 0)
+      continue
+    else if (!isFirstGroup)
+      $results.appendChild($createSeparator())
+
+    appendEntries(entryGroup)
+    isFirstGroup = false
+  }
 
   // TODO: Need to apply apply border radius to search bar when there are and aren't results.
   // Hide the results list completely if there are no results.
-  $results.style.display = transformedEntries.length > 0 ? "block" : "none"
+  $results.style.display = entryGroups.length > 0 ? "block" : "none"
 
   // Update the window's height to match the height of the results list.
   // Since the window uses transparency, this is required to prevent
@@ -81,6 +89,13 @@ function setResults(entries) {
   const appWindow = util.getApplicationWindow()
 
   appWindow.setSize(appWindow.getSize()[0], document.body.clientHeight)
+}
+
+function appendEntries(entries) {
+  const transformedEntries = transformEntries(entries)
+
+  for (const [index, entry] of transformedEntries.entries())
+    $results.appendChild($createEntry(entry, index))
 }
 
 window.onload = () => {
