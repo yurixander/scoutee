@@ -20,13 +20,13 @@ function updateResults() {
   renderEntries([filteredAppEntries, util.getAuxEntries(), util.getMetaEntries()])
 }
 
-function $createEntry(entry, tabIndex) {
+function $createEntry(entry) {
   const $result = document.createElement("li")
   const $icon = document.createElement("img")
   const $name = document.createElement("span")
   const $label = document.createElement("span")
 
-  $result.setAttribute("tabindex", tabIndex)
+  $result.setAttribute("tabindex", 0)
   $icon.setAttribute("src", entry.icon)
   $name.textContent = entry.name
   $label.textContent = entry.label

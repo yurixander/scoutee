@@ -11,7 +11,10 @@ function getApplicationWindow() {
 
 function endSession() {
   $search.value = ""
-  setResults([])
+
+  // TODO: Need to access `main.js`'s `renderEntries` function, but simply importing it would cause a circular dependency problem.
+  console.log("Clearing results is not yet implemented")
+
   app.hide()
 }
 

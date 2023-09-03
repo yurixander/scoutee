@@ -17,7 +17,6 @@ function createWindow() {
     alwaysOnTop: true,
     show: false,
     backgroundMaterial: "acrylic",
-    hasShadow: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
