@@ -65,6 +65,7 @@ function transformEntries(entries) {
 
 function renderEntries(entryGroups) {
   $results.innerHTML = ""
+
   let isFirstGroup = true
 
   for (const entryGroup of entryGroups) {

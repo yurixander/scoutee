@@ -9,10 +9,15 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^26.1.0"
+    "electron": "^26.1.0",
+    "sass": "^1.69.5",
+    "typescript": "^5.2.2",
+    "vite": "^4.5.0"
   },
   "dependencies": {
     "@electron/remote": "^2.0.11",
-    "electron-icns-ex": "^1.0.1"
+    "electron-icns-ex": "^1.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }
